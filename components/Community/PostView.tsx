@@ -5,7 +5,8 @@ import {
   StyleSheet, 
   TouchableOpacity, 
   TextInput, 
-  ScrollView 
+  ScrollView,
+  Image 
 } from 'react-native';
 import { 
   doc, 
@@ -22,6 +23,8 @@ interface PostProps {
   materials: string[];
   likes: number;
   comments: string[];
+  imageUrl?: string;
+  imagePath?: string;
 }
 
 const PostView: React.FC<PostProps> = ({
@@ -30,7 +33,9 @@ const PostView: React.FC<PostProps> = ({
   username,
   materials,
   likes,
-  comments
+  comments,
+  imageUrl,
+  imagePath
 }) => {
   const [newComment, setNewComment] = useState('');
   const [localLikes, setLocalLikes] = useState(likes);
@@ -97,7 +102,18 @@ const PostView: React.FC<PostProps> = ({
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Text style={styles.username}>{username}</Text>
+        <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+          <Text style={styles.likeText}>❤️ {localLikes}</Text>
+        </TouchableOpacity>
       </View>
+
+      {imageUrl && (
+        <Image 
+          source={{ uri: imageUrl }} 
+          style={styles.postImage} 
+          resizeMode="cover"
+        />
+      )}
 
       <Text style={styles.description}>{description}</Text>
 
@@ -108,12 +124,6 @@ const PostView: React.FC<PostProps> = ({
             • {material}
           </Text>
         ))}
-      </View>
-
-      <View style={styles.interactionContainer}>
-        <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
-          <Text style={styles.likeText}>❤️ {localLikes}</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.commentsContainer}>
@@ -160,12 +170,19 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
   username: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
+  },
+  postImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   description: {
     fontSize: 14,
@@ -182,10 +199,6 @@ const styles = StyleSheet.create({
   materialItem: {
     marginLeft: 10,
     color: '#555',
-  },
-  interactionContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
   },
   likeButton: {
     flexDirection: 'row',

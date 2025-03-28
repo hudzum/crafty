@@ -17,7 +17,6 @@ export default function TabTwoScreen() {
         </View>
         <View style={styles.buttonContainer}>
           <CreatePostButton/>
-          CreatePost
         </View>
       </View>
       <View style={styles.postListContainer}>

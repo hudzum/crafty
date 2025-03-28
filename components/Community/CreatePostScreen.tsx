@@ -13,16 +13,24 @@ import {
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
-import { db } from '../../FirebaseConfig';
+import { db, storage } from '../../FirebaseConfig';
+import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+import * as ImagePicker from 'expo-image-picker';
 
 // Add an optional onPostCreated prop
 const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => {
+
+  const [image, setImage] = useState<string | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imagePath, setImagePath] = useState<string | null>(null);
+
   const [description, setDescription] = useState('');
   const [materials, setMaterials] = useState(['']);
   const [loading, setLoading] = useState(false);
 
   const auth = getAuth();
-  
+  const user = auth.currentUser;
   const addMaterialInput = () => {
     setMaterials([...materials, '']);
   };
@@ -37,32 +45,90 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
     const newMaterials = materials.filter((_, i) => i !== index);
     setMaterials(newMaterials);
   };
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-  // ... (rest of the previous implementation remains the same)
+    console.log(result);
 
-  const handleCreatePost = async () => {
-    // ... (previous validation code)
-    if (!description.trim()) {
-        Alert.alert('Validation Error', 'Please enter a description');
-        return;
-      }
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const imageUri = result.assets[0].uri;
+      console.log(result, 'the result');
+      setImage(imageUri);
+      console.log("Image picked: ", imageUri);
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!user || !image) {
+      console.log(`User: ${user}, Image: ${image}`);
+      Alert.alert('No user or image found!');
+      return { url: null, path: null };
+    }
   
-      // Filter out empty material inputs
-      const filteredMaterials = materials.filter(material => material.trim() !== '');
+    console.log("Attempting to upload image: ", image);
   
-      if (filteredMaterials.length === 0) {
-        Alert.alert('Validation Error', 'Please add at least one material');
-        return;
-      }
-  
-      // Ensure user is logged in
-      if (!auth.currentUser) {
-        Alert.alert('Authentication Error', 'Please log in to create a post');
-        return;
-      }
-  
-      setLoading(true);
     try {
+      const response = await fetch(image);
+      const blob = await response.blob();
+  
+      console.log("Blob created: ", blob);
+      const filePath = `images/${user.uid}/${Date.now()}`;
+      const storageRef = ref(storage, filePath);
+      await uploadBytes(storageRef, blob);
+  
+      const url = await getDownloadURL(storageRef);
+      
+      // Still update the state for other components that might need it
+      setImageUrl(url);
+      setImagePath(filePath);
+  
+      console.log("Image uploaded and URL retrieved: ", url);
+      return { url, path: filePath }; // Return the values directly
+    } catch (error: any) {
+      console.error("Error uploading image: ", error);
+      Alert.alert('Upload failed!', error.message);
+      return { url: null, path: null };
+    }
+  };
+  
+  const handleCreatePost = async () => {
+    if (!description.trim()) {
+      Alert.alert('Validation Error', 'Please enter a description');
+      return;
+    }
+  
+    // Filter out empty material inputs
+    const filteredMaterials = materials.filter(material => material.trim() !== '');
+  
+    if (filteredMaterials.length === 0) {
+      Alert.alert('Validation Error', 'Please add at least one material');
+      return;
+    }
+  
+    // Ensure user is logged in
+    if (!auth.currentUser) {
+      Alert.alert('Authentication Error', 'Please log in to create a post');
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      // Wait for image upload and get the values directly
+      const { url, path } = await uploadImage();
+  
+      // Check the returned values, not the state
+      if (!url) {
+        Alert.alert('Error', 'Failed to upload image. Please try again.');
+        setLoading(false);
+        return;
+      }
+  
       const postRef = await addDoc(collection(db, 'posts'), {
         description: description.trim(),
         userId: auth.currentUser?.uid,
@@ -71,16 +137,19 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
         comments: [],
         likes: 0,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        imageUrl: url,  // Use the returned value directly
+        imagePath: path, // Use the returned value directly
       });
-
+  
       // Call the onPostCreated callback if provided
       onPostCreated && onPostCreated();
-
+  
       // Reset form
       setDescription('');
       setMaterials(['']);
-
+      setImage(null);
+  
       // Optional: show success message
       Alert.alert('Success', 'Post created successfully!');
     } catch (error) {
@@ -106,7 +175,14 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
-
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Image</Text>
+          <TouchableOpacity onPress={pickImage}>
+            <Text >
+              UploadImage
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Description</Text>
           <TextInput

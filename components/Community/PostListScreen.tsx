@@ -22,6 +22,8 @@ interface Post {
   likes: number;
   comments: string[];
   createdAt: any;
+  imageUrl: string;
+  imagePath: string;
 }
 
 const PostListScreen = () => {
@@ -78,6 +80,8 @@ const PostListScreen = () => {
       materials={item.materials}
       likes={item.likes}
       comments={item.comments}
+      imageUrl={item.imageUrl}
+      imagePath={item.imagePath}
     />
   );
 
