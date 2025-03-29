@@ -10,19 +10,19 @@ import PostListScreen from '@/components/Community/PostListScreen';
 export default function TabTwoScreen() {
   const auth = getAuth();
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Community Posts</Text>
-        </View>
-        <View style={styles.buttonContainer}>
-          <CreatePostButton/>
-        </View>
-      </View>
-      <View style={styles.postListContainer}>
-        <PostListScreen/>
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+  <View style={styles.headerContainer}>
+    <View style={styles.titleContainer}>
+      <Text style={styles.title}>Community Posts</Text>
+    </View>
+    <View style={styles.buttonContainer}>
+      <CreatePostButton />
+    </View>
+  </View>
+  <View style={styles.postListContainer}>
+    <PostListScreen />
+  </View>
+</View>
   );
 }
 
@@ -36,9 +36,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
+    paddingTop: 65,  // Apply padding here
     paddingBottom: 10,
     backgroundColor: '#c3c4b1',
-
   },
   titleContainer: {
     flex: 1,
