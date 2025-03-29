@@ -29,7 +29,6 @@ const ProfileScreen = () => {
       
       if (!user) {
         // User is not logged in, redirect to sign in
-        router.replace('/')
         return
       }
 
@@ -307,7 +306,6 @@ const styles = StyleSheet.create({
   },
   fieldContainer: {
     marginBottom: 20,
-    backgroundColor: '#c3c4b1',
   },
   fieldLabel: {
     fontSize: 14,
