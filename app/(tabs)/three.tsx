@@ -3,12 +3,14 @@ import { StyleSheet } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ObjectDetectionScreen } from '@/components/Scan/ObjectDetection/ObjectDetectionScreen';
+import { useState } from 'react';
 
 export default function TabTwoScreen() {
+  const [imageUri, setImageUri] = useState('');
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Storage</Text>
-       
+      <ObjectDetectionScreen imageUri={imageUri} setImageUri={setImageUri} />
     </SafeAreaView>
   );
 }

@@ -1,94 +1,369 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { getAuth, signOut } from 'firebase/auth';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text, View } from '@/components/Themed';
-import { router } from 'expo-router';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ActivityIndicator, Alert, Platform } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { getAuth } from 'firebase/auth'
+import {  doc, getDoc, updateDoc } from 'firebase/firestore'
+import {  ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import * as ImagePicker from 'expo-image-picker'
+import { router } from 'expo-router'
+import { db, storage } from '../../FirebaseConfig'
+const ProfileScreen = () => {
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [profileImage, setProfileImage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isEditing, setIsEditing] = useState(false)
+  const [newUsername, setNewUsername] = useState('')
+  const [uploadLoading, setUploadLoading] = useState(false)
 
-export default function TabTwoScreen() {
-  const auth = getAuth();
-  const user = auth.currentUser;
+  const auth = getAuth()
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    fetchUserData()
+  }, [])
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true)
+      const user = auth.currentUser
+      
+      if (!user) {
+        // User is not logged in, redirect to sign in
+        Alert.alert('Error', 'You must be logged in to view this page')
+        router.replace('/')
+        return
+      }
+
+      // Get user data from Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data()
+        setUsername(userData.username || '')
+        setNewUsername(userData.username || '')
+        setEmail(userData.email || user.email || '')
+        setProfileImage(userData.profileImageUrl || null)
+      } else {
+        console.log('No user document found')
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+      Alert.alert('Error', 'Failed to load profile data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleEditToggle = () => {
+    if (isEditing) {
+      // If we're exiting edit mode, reset the new username
+      setNewUsername(username)
+    }
+    setIsEditing(!isEditing)
+  }
+
+  const handleSaveProfile = async () => {
+    try {
+      const user = auth.currentUser
+      if (!user) return
+
+      // Validate username
+      if (!newUsername.trim()) {
+        Alert.alert('Error', 'Username cannot be empty')
+        return
+      }
+
+      setIsLoading(true)
+      
+      // Update user document in Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        username: newUsername.trim()
+      })
+
+      setUsername(newUsername.trim())
+      setIsEditing(false)
+      Alert.alert('Success', 'Username updated successfully')
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      Alert.alert('Error', 'Failed to update profile')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handlePickImage = async () => {
+    // Request permission
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    
+    if (!permissionResult.granted) {
+      Alert.alert('Permission Required', 'You need to grant permission to access your photos')
+      return
+    }
+
+    // Pick image
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    })
+
+    if (!result.canceled) {
+      uploadProfileImage(result.assets[0].uri)
+    }
+  }
+
+  const uploadProfileImage = async (uri: string) => {
+    try {
+      const user = auth.currentUser
+      if (!user) return
+
+      setUploadLoading(true)
+
+      // Create a reference to the file in Firebase Storage
+      const storageRef = ref(storage, `profileImages/${user.uid}`)
+      
+      // Convert image to blob
+      const response = await fetch(uri)
+      const blob = await response.blob()
+      
+      // Upload blob
+      await uploadBytes(storageRef, blob)
+      
+      // Get download URL
+      const downloadURL = await getDownloadURL(storageRef)
+      
+      // Update user document with profile image URL
+      await updateDoc(doc(db, 'users', user.uid), {
+        profileImageUrl: downloadURL
+      })
+      
+      // Update state
+      setProfileImage(downloadURL)
+      Alert.alert('Success', 'Profile picture updated successfully')
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      Alert.alert('Error', 'Failed to update profile picture')
+    } finally {
+      setUploadLoading(false)
+    }
+  }
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
-      // Navigation would typically be handled here, 
-      // e.g., navigating back to login screen
-      router.push('/');
+      await auth.signOut()
+      router.replace('/')
     } catch (error) {
-      console.error('Sign out error', error);
+      console.error('Error signing out:', error)
+      Alert.alert('Error', 'Failed to sign out')
     }
-  };
+  }
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007bff" />
+        <Text style={styles.loadingText}>Loading profile...</Text>
+      </View>
+    )
+  }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.profileHeader}>
-     
-        <Text style={styles.title}>{user?.displayName || 'User'}</Text>
-        <Text style={styles.email}>{"Hey " +user?.email+" 👋" }</Text>
+        <View style={styles.profileImageContainer}>
+          {uploadLoading ? (
+            <View style={styles.profileImage}>
+              <ActivityIndicator size="small" color="#fff" />
+            </View>
+          ) : (
+            <>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.profileImage}>
+                  <Text style={styles.profileInitial}>{username.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+            </>
+          )}
+          <TouchableOpacity 
+            style={styles.changePhotoButton} 
+            onPress={handlePickImage}
+            disabled={uploadLoading}
+          >
+            <Text style={styles.changePhotoText}>Change Photo</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.infoSection}>
-        <TouchableOpacity style={styles.infoItem}>
-          <Text style={styles.infoItemText}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.infoItem}>
-          <Text style={styles.infoItemText}>Account Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.signOutButton} 
-          onPress={handleSignOut}
-        >
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+      <View style={styles.profileDetails}>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Username</Text>
+          {isEditing ? (
+            <TextInput
+              style={styles.input}
+              value={newUsername}
+              onChangeText={setNewUsername}
+              placeholder="Enter new username"
+              autoCapitalize="none"
+            />
+          ) : (
+            <Text style={styles.fieldValue}>{username}</Text>
+          )}
+        </View>
+
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Email</Text>
+          <Text style={styles.fieldValue}>{email}</Text>
+          <Text style={styles.fieldNote}>Email cannot be changed</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          {isEditing ? (
+            <>
+              <TouchableOpacity 
+                style={[styles.button, styles.saveButton]} 
+                onPress={handleSaveProfile}
+              >
+                <Text style={styles.buttonText}>Save Changes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.button, styles.cancelButton]} 
+                onPress={handleEditToggle}
+              >
+                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity 
+              style={[styles.button, styles.editButton]} 
+              onPress={handleEditToggle}
+            >
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </TouchableOpacity>
+          )}
+          
+          <TouchableOpacity 
+            style={[styles.button, styles.signOutButton]} 
+            onPress={handleSignOut}
+          >
+            <Text style={styles.buttonText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </SafeAreaView>
-  );
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f9f9f9',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
   },
-  profileHeader: {
-    alignItems: 'center',
-    marginTop: 30,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  email: {
-    fontSize: 16,
+  loadingText: {
+    marginTop: 10,
     color: '#666',
   },
-  infoSection: {
-    width: '85%',
-    marginTop: 20,
+  profileHeader: {
+    backgroundColor: '#007bff',
+    alignItems: 'center',
+    paddingTop: 40,
+    paddingBottom: 20,
   },
-  infoItem: {
-    backgroundColor: 'white',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  infoItemText: {
-    fontSize: 16,
-  },
-  signOutButton: {
-    backgroundColor: '#ff4444',
-    padding: 15,
-    borderRadius: 10,
-    marginTop: 20,
+  profileImageContainer: {
     alignItems: 'center',
   },
-  signOutText: {
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#0069d9',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  profileInitial: {
+    fontSize: 48,
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 16,
   },
-});
+  changePhotoButton: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  changePhotoText: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  profileDetails: {
+    padding: 20,
+  },
+  fieldContainer: {
+    marginBottom: 20,
+  },
+  fieldLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  fieldValue: {
+    fontSize: 18,
+    color: '#333',
+    fontWeight: '500',
+  },
+  fieldNote: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    backgroundColor: 'white',
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  button: {
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  buttonText: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: 'white',
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+  },
+  saveButton: {
+    backgroundColor: '#28a745',
+  },
+  cancelButton: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#dc3545',
+  },
+  cancelButtonText: {
+    color: '#dc3545',
+  },
+  signOutButton: {
+    backgroundColor: '#dc3545',
+    marginTop: 20,
+  },
+})
+
+export default ProfileScreen

@@ -3,13 +3,37 @@ import React, { useState } from 'react'
 import { auth } from '../FirebaseConfig'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { router } from 'expo-router'
-
+import { doc, setDoc } from 'firebase/firestore'
+import {db} from '../FirebaseConfig'
 const SignInScreen = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
+  
+  // Initialize Firestore
+
+  // Function to generate username from email
+  const generateUsername = (email: string) => {
+    return email.split('@')[0]
+  }
+
+  // Function to create user document in Firestore
+  const createUserDocument = async (userId: string, email: string ) => {
+    try {
+      const username = generateUsername(email)
+      await setDoc(doc(db, "users", userId), {
+        email: email,
+        username: username,
+        createdAt: new Date()
+      })
+      console.log("User document created successfully")
+    } catch (error) {
+      console.error("Error creating user document:", error)
+      Alert.alert("Warning", "Account created but profile setup failed. Some features may be limited.")
+    }
+  }
 
   const handleAuthentication = async () => {
     // Validate inputs
@@ -35,14 +59,16 @@ const SignInScreen = () => {
     setError('')
 
     try {
-      let user;
+      let userCredential;
       if (isSignUp) {
-        user = await createUserWithEmailAndPassword(auth, email, password)
+        userCredential = await createUserWithEmailAndPassword(auth, email, password)
+        // Create user document in Firestore when a new user signs up
+        await createUserDocument(userCredential.user.uid, email)
       } else {
-        user = await signInWithEmailAndPassword(auth, email, password)
+        userCredential = await signInWithEmailAndPassword(auth, email, password)
       }
 
-      if (user) {
+      if (userCredential) {
         router.replace("/(tabs)")
       }
     } catch (error: any) {
