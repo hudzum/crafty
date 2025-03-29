@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   selectedMaterialButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#8d8e7c',
   },
   materialButtonText: {
     color: '#000',
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   searchButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#8d8e7c',
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',

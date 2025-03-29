@@ -102,7 +102,7 @@ const SignInScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.innerContainer}>
-        <Text style={styles.title}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
+        <Text style={styles.title}>{isSignUp ? 'Let’s Get Crafty!' : 'Back To Craftin’!'}</Text>
         
         <View style={styles.inputContainer}>
           <TextInput
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: 'white',
+    backgroundColor: '#c3c4b1',
   },
   innerContainer: {
     paddingHorizontal: 20,
@@ -168,18 +168,20 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    color: '#333',
+    color: '#344b33',
+    fontFamily: 'Ojuju-Regular',
   },
   inputContainer: {
     marginBottom: 20,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
     marginBottom: 10,
     fontSize: 16,
+    color: '#344b33',
   },
   errorText: {
     color: 'red',
@@ -187,7 +189,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   authButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#344b33',
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
@@ -202,7 +204,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   switchButtonText: {
-    color: '#007bff',
+    color: '#344b33',
     fontWeight: '600',
   },
 })

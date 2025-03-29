@@ -259,7 +259,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#c3c4b1',
   },
   loadingContainer: {
     flex: 1,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   profileHeader: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#8d8e7c',
     alignItems: 'center',
     paddingTop: 40,
     paddingBottom: 20,
@@ -312,22 +312,22 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#344b33',
     marginBottom: 5,
   },
   fieldValue: {
     fontSize: 18,
-    color: '#333',
+    color: '#344b33',
     fontWeight: '500',
   },
   fieldNote: {
     fontSize: 12,
-    color: '#999',
+    color: '#344b33',
     marginTop: 5,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    color: '#344b33',
     borderRadius: 8,
     padding: 10,
     fontSize: 16,
@@ -349,21 +349,21 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   editButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#344b33',
   },
   saveButton: {
-    backgroundColor: '#28a745',
+    backgroundColor: '#344b33',
   },
   cancelButton: {
     backgroundColor: 'white',
     borderWidth: 1,
-    borderColor: '#dc3545',
+    borderColor: '#8d8e7c',
   },
   cancelButtonText: {
-    color: '#dc3545',
+    color: '#8d8e7c',
   },
   signOutButton: {
-    backgroundColor: '#dc3545',
+    backgroundColor: '#8d8e7c',
     marginTop: 20,
   },
 })
