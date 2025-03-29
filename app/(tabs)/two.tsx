@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 10,
     paddingBottom: 10,
     backgroundColor: '#c3c4b1',
 
@@ -48,7 +47,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginLeft: 10,
-    
   },
   title: {
     fontSize: 20,

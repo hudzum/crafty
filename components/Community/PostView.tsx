@@ -80,7 +80,7 @@ const PostView: React.FC<PostProps> = ({
 
       const postRef = doc(db, 'posts', id);
       
-      const commentToAdd = `${auth.currentUser.displayName || 'Anonymous'}: ${newComment.trim()}`;
+      const commentToAdd = `${auth.currentUser.username || 'Anonymous'}: ${newComment.trim()}`;
 
       // Optimistically update UI
       setLocalComments(prev => [...prev, commentToAdd]);
@@ -101,7 +101,7 @@ const PostView: React.FC<PostProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.username}>{username}</Text>
+        <Text style={styles.username}>@{username}</Text>
         <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
           <Text style={styles.likeText}>❤️ {localLikes}</Text>
         </TouchableOpacity>
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   sendCommentButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#344b33',
     borderRadius: 20,
     paddingHorizontal: 15,
     paddingVertical: 10,
