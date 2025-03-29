@@ -309,6 +309,7 @@ const styles = StyleSheet.create({
   },
   fieldContainer: {
     marginBottom: 20,
+    backgroundColor: '#c3c4b1',
   },
   fieldLabel: {
     fontSize: 14,
