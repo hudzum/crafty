@@ -171,24 +171,86 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.profileHeader}>
-     
-        <Text style={styles.title}>{user?.displayName || 'User'}</Text>
-        <Text style={styles.email}>{"Hey " +user?.email+" 👋" }</Text>
+        <View style={styles.profileImageContainer}>
+          {uploadLoading ? (
+            <View style={styles.profileImage}>
+              <ActivityIndicator size="small" color="#fff" />
+            </View>
+          ) : (
+            <>
+              {profileImage ? (
+                <Image source={{ uri: profileImage }} style={styles.profileImage} />
+              ) : (
+                <View style={styles.profileImage}>
+                  <Text style={styles.profileInitial}>{username.charAt(0).toUpperCase()}</Text>
+                </View>
+              )}
+            </>
+          )}
+          <TouchableOpacity 
+            style={styles.changePhotoButton} 
+            onPress={handlePickImage}
+            disabled={uploadLoading}
+          >
+            <Text style={styles.changePhotoText}>Change Photo</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.infoSection}>
-        <TouchableOpacity style={styles.infoItem}>
-          <Text style={styles.infoItemText}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.infoItem}>
-          <Text style={styles.infoItemText}>Account Settings</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.signOutButton} 
-          onPress={handleSignOut}
-        >
-          <Text style={styles.signOutText}>Sign Out</Text>
-        </TouchableOpacity>
+      <View style={styles.profileDetails}>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Username</Text>
+          {isEditing ? (
+            <TextInput
+              style={styles.input}
+              value={newUsername}
+              onChangeText={setNewUsername}
+              placeholder="Enter new username"
+              autoCapitalize="none"
+            />
+          ) : (
+            <Text style={styles.fieldValue}>{username}</Text>
+          )}
+        </View>
+
+        <View style={styles.fieldContainer}>
+          <Text style={styles.fieldLabel}>Email</Text>
+          <Text style={styles.fieldValue}>{email}</Text>
+          <Text style={styles.fieldNote}>Email cannot be changed</Text>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          {isEditing ? (
+            <>
+              <TouchableOpacity 
+                style={[styles.button, styles.saveButton]} 
+                onPress={handleSaveProfile}
+              >
+                <Text style={styles.buttonText}>Save Changes</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.button, styles.cancelButton]} 
+                onPress={handleEditToggle}
+              >
+                <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity 
+              style={[styles.button, styles.editButton]} 
+              onPress={handleEditToggle}
+            >
+              <Text style={styles.buttonText}>Edit Profile</Text>
+            </TouchableOpacity>
+          )}
+          
+          <TouchableOpacity 
+            style={[styles.button, styles.signOutButton]} 
+            onPress={handleSignOut}
+          >
+            <Text style={styles.buttonText}>Sign Out</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   )
@@ -204,6 +266,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#c3c4b1',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
   },
   profileHeader: {
     backgroundColor: '#007bff',
@@ -243,7 +309,6 @@ const styles = StyleSheet.create({
   },
   fieldContainer: {
     marginBottom: 20,
-    backgroundColor: '#c3c4b1',
   },
   fieldLabel: {
     fontSize: 14,
@@ -272,20 +337,33 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#c3c4b1',
   },
-  infoItem: {
-    backgroundColor: 'white',
+  button: {
     padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     fontWeight: 'bold',
     fontSize: 16,
+    color: 'white',
+  },
+  editButton: {
+    backgroundColor: '#007bff',
+  },
+  saveButton: {
+    backgroundColor: '#28a745',
+  },
+  cancelButton: {
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#dc3545',
+  },
+  cancelButtonText: {
+    color: '#dc3545',
   },
   signOutButton: {
-    backgroundColor: '#ff4444',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#dc3545',
     marginTop: 20,
   },
 })
