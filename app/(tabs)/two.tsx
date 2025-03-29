@@ -29,6 +29,7 @@ export default function TabTwoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#c3c4b1',
   },
   headerContainer: {
     flexDirection: 'row',
@@ -37,12 +38,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 10,
+    backgroundColor: '#c3c4b1',
+
   },
   titleContainer: {
     flex: 1,
+    backgroundColor: '#c3c4b1',
+
   },
   buttonContainer: {
     marginLeft: 10,
+    
   },
   title: {
     fontSize: 20,
@@ -50,5 +56,7 @@ const styles = StyleSheet.create({
   },
   postListContainer: {
     flex: 1,
+    backgroundColor: '#c3c4b1',
+
   },
 });

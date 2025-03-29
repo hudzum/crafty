@@ -29,8 +29,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name="user"
+              color={focused ? '#344b33' : '#8d8e7c'} 
+            />
+          ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -51,19 +56,36 @@ export default function TabLayout() {
         name="two"
         options={{
           title: 'Community',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name="users"
+              color={focused ? '#344b33' : '#8d8e7c'} 
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="three"
         options={{
-          title: 'Storage',
+          title: 'Main',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name="home"
+              color={focused ? '#344b33' : '#8d8e7c'} 
+            />
+          ),
         }}
       />
       <Tabs.Screen
         name="four"
         options={{
           title: 'Scan',
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon
+              name="barcode"
+              color={focused ? '#344b33' : '#8d8e7c'} 
+            />
+          ),
         }}
       />
     </Tabs>
