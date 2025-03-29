@@ -11,12 +11,13 @@ const CreatePostButton = () => {
     
       <View style={styles.container}>
         {/* Button to open the modal */}
+        <View>
         <TouchableOpacity 
           style={styles.openButton} 
-          onPress={() => setIsModalVisible(true)}        >
+          onPress={() => setIsModalVisible(true)}>
           <Text style={styles.buttonText}>+ Create Post</Text>
         </TouchableOpacity>
-
+        </View>
         <Modal
         visible={isModalVisible}
         animationType="slide" // Options: "slide", "fade", "none"
@@ -39,17 +40,19 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: '#c3c4b1',
     },
     openButton: {
-      backgroundColor: '#007bff',
-      padding: 15,
+      backgroundColor: '#344b33', // Green color
       borderRadius: 10,
+      paddingHorizontal: 15,
+      paddingVertical: 1,
     },
     buttonText: {
-      color: '#fff',
+      color: 'white', // Black text
       fontWeight: 'bold',
       fontSize: 16,
+      paddingHorizontal: 10,
     },
     modalBackground: {
       flex: 1,
@@ -57,7 +60,6 @@ const styles = StyleSheet.create({
     },
     modalContainer: {
       flex: 1,
-      backgroundColor: '#fff',
       marginTop: 50,
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,

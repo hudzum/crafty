@@ -126,7 +126,7 @@ const PostListScreen = () => {
 const styles = StyleSheet.create({
   listContainer: {
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#c3c4b1',
   },
   centerContent: {
     flex: 1,

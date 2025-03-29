@@ -3,7 +3,6 @@ import { ScrollView, StyleSheet, Image } from 'react-native';
 import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ObjectDetectionScreen } from '@/components/Scan/ObjectDetection/ObjectDetectionScreen';
 import { useState } from 'react';
 
 export default function TabTwoScreen() {

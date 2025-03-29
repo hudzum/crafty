@@ -15,8 +15,10 @@ import { getAuth } from 'firebase/auth';
 import { router } from 'expo-router';
 import { db, storage } from '../../FirebaseConfig';
 import {  ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import { doc, getDoc } from 'firebase/firestore';
 import * as ImagePicker from 'expo-image-picker';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+
 
 // Add an optional onPostCreated prop
 const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => {
@@ -96,7 +98,28 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
       return { url: null, path: null };
     }
   };
-  
+  const getUsernameByUuid = async (uuid) => {
+    try {
+      // Reference to the specific user document
+      const userRef = doc(db, 'users', uuid);
+      
+      // Get the document
+      const userSnap = await getDoc(userRef);
+      
+      // Check if document exists
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        return userData.username || null;
+      } else {
+        console.log(`No user found with UUID: ${uuid}`);
+        return null;
+      }
+    } catch (error) {
+      console.error('Error getting username:', error);
+      return null;
+    }
+  };
+
   const handleCreatePost = async () => {
     if (!description.trim()) {
       Alert.alert('Validation Error', 'Please enter a description');
@@ -128,11 +151,11 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
         setLoading(false);
         return;
       }
-  
+      const username = await getUsernameByUuid(auth.currentUser?.uid);
       const postRef = await addDoc(collection(db, 'posts'), {
         description: description.trim(),
         userId: auth.currentUser?.uid,
-        username: auth.currentUser?.displayName || 'Anonymous User',
+        username: username || 'Anonymous User',
         materials: filteredMaterials,
         comments: [],
         likes: 0,
@@ -176,11 +199,11 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
           </TouchableOpacity>
         </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Image</Text>
+          <Text style={styles.label}>Upload Image</Text>
           <TouchableOpacity onPress={pickImage}>
-            <Text >
-              UploadImage
-            </Text>
+          <View style={{ alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+            <MaterialIcons name="add-photo-alternate" size={100} color="#344b33" />
+          </View>
           </TouchableOpacity>
         </View>
         <View style={styles.inputContainer}>
@@ -240,7 +263,7 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'white',
+      backgroundColor: '#c3c4b1',
     },
     scrollContainer: {
       padding: 20,
@@ -291,7 +314,7 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
       fontSize: 18,
     },
     addMaterialButton: {
-      backgroundColor: '#007bff',
+      backgroundColor: '#8d8e7c',
       borderRadius: 10,
       padding: 10,
       alignItems: 'center',
@@ -301,7 +324,7 @@ const CreatePostScreen = ({ onPostCreated }: { onPostCreated?: () => void }) => 
       fontWeight: 'bold',
     },
     createPostButton: {
-      backgroundColor: '#28a745',
+      backgroundColor: '#344b33',
       borderRadius: 10,
       padding: 15,
       alignItems: 'center',

@@ -29,7 +29,6 @@ const ProfileScreen = () => {
       
       if (!user) {
         // User is not logged in, redirect to sign in
-        Alert.alert('Error', 'You must be logged in to view this page')
         router.replace('/')
         return
       }
@@ -48,7 +47,6 @@ const ProfileScreen = () => {
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
-      Alert.alert('Error', 'Failed to load profile data')
     } finally {
       setIsLoading(false)
     }
