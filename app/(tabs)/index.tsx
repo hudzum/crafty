@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   profileHeader: {
     backgroundColor: '#8d8e7c',
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 100,
     paddingBottom: 20,
   },
   profileImageContainer: {

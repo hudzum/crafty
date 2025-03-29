@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native'
+import { View, Text, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert, Image } from 'react-native'
 import React, { useState } from 'react'
 import { auth } from '../FirebaseConfig'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
@@ -102,6 +102,8 @@ const SignInScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.innerContainer}>
+      <Text style={styles.maintitle}>Welcome to</Text>
+      <Image source={require('@/assets/images/CraftyLogo.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.title}>{isSignUp ? 'Let’s Get Crafty!' : 'Back To Craftin’!'}</Text>
         
         <View style={styles.inputContainer}>
@@ -171,6 +173,14 @@ const styles = StyleSheet.create({
     color: '#344b33',
     fontFamily: 'Ojuju-Regular',
   },
+  maintitle: {
+    fontSize: 50,
+    fontWeight: 'bold',
+    paddingTop: -400,
+    fontFamily: 'Ojuju-Regular',
+    color: '#344b33',
+    textAlign: 'center',
+  },
   inputContainer: {
     marginBottom: 20,
   },
@@ -182,6 +192,13 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     fontSize: 16,
     color: '#344b33',
+  },
+  logo: {
+    width: 300,
+    height: 300,
+    marginTop: 10,
+    marginBottom: 20,
+    alignSelf: 'center',
   },
   errorText: {
     color: 'red',

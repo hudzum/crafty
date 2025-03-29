@@ -48,25 +48,15 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
-        name="three"
-        options={{
-          title: 'Main',
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon
-              name="home"
-              color={focused ? '#344b33' : '#8d8e7c'} 
-            />
-          ),
-        }}
-      />
+     
+      
       <Tabs.Screen
         name="four"
         options={{
-          title: 'Scan',
+          title: 'Search',
           tabBarIcon: ({ focused }) => (
             <TabBarIcon
-              name="barcode"
+              name="search"
               color={focused ? '#344b33' : '#8d8e7c'} 
             />
           ),

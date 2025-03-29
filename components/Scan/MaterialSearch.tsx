@@ -28,8 +28,13 @@ interface Post {
 
 // List of all possible materials
 const ALL_MATERIALS: string[] = [
-  'Wood', 'Metal', 'Plastic', 'Glass', 'Ceramic', 
-  'Fabric', 'Leather', 'Paper', 'Electronics', 'Paint'
+  'Water Bottle',
+  'Toliet Paper Rolls',
+  'Soda Bottle',
+  'Tissue Boxes',
+  'Soda Can',
+  'Cardboard',
+  'Paper',
   // Add more materials as needed
 ];
 
@@ -110,7 +115,6 @@ const MaterialSearchComponent: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Search Posts by Materials</Text>
       
       {/* Materials Dropdown Button */}
       <TouchableOpacity 

@@ -6,14 +6,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialSearchComponent from '@/components/Scan/MaterialSearch';
   export default function TabTwoScreen() {
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Scan</Text>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.title}>Search Posts by Materials</Text>
+      <MaterialSearchComponent/>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: 65,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
